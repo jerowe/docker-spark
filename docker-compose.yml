@@ -1,13 +1,18 @@
 version: "2.2"
 services:
   master:
-    image: gettyimages/spark
+#    image: gettyimages/spark
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: bin/spark-class org.apache.spark.deploy.master.Master -h master
     hostname: master
     environment:
       MASTER: spark://master:7077
       SPARK_CONF_DIR: /conf
       SPARK_PUBLIC_DNS: localhost
+      ## THis port MUST MATCH THE EXPOSED PORT
+      SPARK_MASTER_WEBUI_PORT: 8090
     expose:
       - 7001
       - 7002
@@ -20,13 +25,19 @@ services:
       - 4040:4040
       - 6066:6066
       - 7077:7077
-      - 8080:8080
+      # Check out the web UI master at localhost:8090
+      # TODO Gotta keep these the saaaame
+      # Some parts of the web UI don't work when I change the port
+      - 8090:8090
     volumes:
       - ./conf/master:/conf
       - ./data:/tmp/data
 
   worker:
-    image: gettyimages/spark
+#    image: gettyimages/spark
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
     hostname: worker
     environment:
@@ -34,7 +45,7 @@ services:
       SPARK_WORKER_CORES: 2
       SPARK_WORKER_MEMORY: 1g
       SPARK_WORKER_PORT: 8881
-      SPARK_WORKER_WEBUI_PORT: 8081
+      SPARK_WORKER_WEBUI_PORT: 8091
       SPARK_PUBLIC_DNS: localhost
     links:
       - master
@@ -45,7 +56,7 @@ services:
       - 7015
       - 8881
     ports:
-      - 8081:8081
+      - 8091:8091
     volumes:
       - ./conf/worker:/conf
       - ./data:/tmp/data
