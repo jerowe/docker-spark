@@ -1,38 +1,27 @@
 
-# spark
+# Original Github
+
+This is forked from [gettyimages](https://github.com/gettyimages/docker-spark)
+
+# About
 
 A `debian:stretch` based [Spark](http://spark.apache.org) container. Use it in a standalone cluster with the accompanying `docker-compose.yml`, or as a base for more complex recipes.
 
-## docker example
+## Why
 
-To run `SparkPi`, run the image with Docker:
+I want to get familiar with Spark, and didn't want to have to install Spark. So I found myself a nice docker instance and started to play around. 
 
-    docker run --rm -it -p 4040:4040 gettyimages/spark bin/run-example SparkPi 10
+I wrote a very [brief blog post](https://dabble-of-devops.com/getting-familiar-with-spark-using-docker/) about the process.
 
-To start `spark-shell` with your AWS credentials:
+## Run
 
-    docker run --rm -it -e "AWS_ACCESS_KEY_ID=YOURKEY" -e "AWS_SECRET_ACCESS_KEY=YOURSECRET" -p 4040:4040 gettyimages/spark bin/spark-shell
+Bring up the docker-compose instance
 
-To do a thing with Pyspark
+    docker-compose up -d
+    docker-compose exec master bin/run-example SparkPi 10
+    docker-compose exec master python /tmp/data/sort.py /tmp/data/sort_this
 
-    echo -e "import pyspark\n\nprint(pyspark.SparkContext().parallelize(range(0, 10)).count())" > count.py
-    docker run --rm -it -p 4040:4040 -v $(pwd)/count.py:/count.py gettyimages/spark bin/spark-submit /count.py
-
-## docker-compose example
-
-To create a simplistic standalone cluster with [docker-compose](http://docs.docker.com/compose):
-
-    docker-compose up
-
-The SparkUI will be running at `http://${YOUR_DOCKER_HOST}:8080` with one worker listed. To run `pyspark`, exec into a container:
-
-    docker exec -it dockerspark_master_1 /bin/bash
-    bin/pyspark
-
-To run `SparkPi`, exec into a container:
-
-    docker exec -it dockerspark_master_1 /bin/bash
-    bin/run-example SparkPi 10
+Spark has a super nice web UI. For this compose instance its up at http://localhost:8090/.  If you ran the code above you should see two completed applications, one 'PythonSort' and one 'Spark Pi' job.
 
 ## license
 
